@@ -12,9 +12,13 @@
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
+  |            2023/04/03 LBD - Add copyright/license          |
   |            2022/11/28 LBD - Improve display                |
   |            2022/08/17 LBD - Creation                       |
   |                                                            |
+  * ---------------------------------------------------------- *
+  | Copyright (c) 2022-2023 by Lionel B. Dyck                  |
+  | License is Copy-Left                                       |
   * ---------------------------------------------------------- */
 
   /* -------------------- *
