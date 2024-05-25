@@ -1,64 +1,82 @@
+/* REXX - needed so this can run under a shell interface */
   /* --------------------  rexx procedure  -------------------- *
   | Name:      GETIPLDT                                        |
   |                                                            |
   | Function:  Using SDSF REXX query for all LPARs in the      |
   |            SYSPLEX for IPLINFO and extract the IPL         |
-  |            date/time, and z/OS Release.                    |
+  |            date/time, and z/OS Release, and more to        |
+  |            report.                                         |
+  |                                                            |
+  |            May also be run under OMVS shell.               |
   |                                                            |
   | Syntax:    %getipldt                                       |
+  |                                                            |
+  |            if a non-blank parm is provided then only the   |
+  |            active/current system will be reported on.      |
   |                                                            |
   | Dependencies:  SDSF REXX                                   |
   |                                                            |
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
-  |            2023/04/03 LBD - Add copyright/license          |
+  |            2024/05/25 LBD - redo using SDSF SYS info       |
+  |            2024/02/10 LBD - enable use under shell         |
+  |            2023/09/06 LBD - Add isfcalls(off)              |
   |            2022/11/28 LBD - Improve display                |
   |            2022/08/17 LBD - Creation                       |
   |                                                            |
   * ---------------------------------------------------------- *
-  | Copyright (c) 2022-2023 by Lionel B. Dyck                  |
+  | Copyright (c) 2022-2024 by Lionel B. Dyck                  |
   | License is Copy-Left                                       |
   * ---------------------------------------------------------- */
 
-  /* -------------------- *
-  | Define key variables |
-  * -------------------- */
-  parse value '' with null hit system. lpar
-  lparc = 0
+  if Address() = 'SH' then 'clear'
 
-  /* ----------------------- *
-  | Issue the query command |
-  * ----------------------- */
+  /* ----------------------- REXX --------------------------- *
+  | Report on all systems in the sysplex using SDSF SYS info |
+  |                                                          |
+  | If parm is non blank then only display info on the       |
+  | current system.                                          |
+  * -------------------------------------------------------- */
+  arg current
+
+  isfsysname = '*'
+  isfowner = "*"
+
+  if current /= ''
+  then do
+    current = mvsvar('sysname')
+    isffilter = 'sysname' current
+  end
+
+  /* -------------------------- *
+  | Enable SDSF Rexx Interface |
+  * -------------------------- */
   x = isfcalls('on')
-  cmd.0 = 1
-  cmd.1 = 'RO *ALL,D IPLINFO'
-  Address SDSF "ISFSLASH ("cmd.") (WAIT)"
-  do i = 1 to isfulog.0
-    if hit = null then do
-      if pos('IEE254I',isfulog.i) > 0 then do
-         hit = 1
-         lparc = lparc +1
-         lpar = mvsvar('sysname')
-         end
-      if pos('IEE421I',isfulog.i) = 0 then iterate
-      hit = 1
-      iterate
-    end
-    if word(isfulog.i,2) = 'RESPONSES' then do
-      lpar = word(isfulog.i,1)
-      lparc = lparc + 1
-    end
-    if lpar = null then iterate
-    if word(isfulog.i,1) = 'SYSTEM' then
-      system.lparc = lpar word(isfulog.i,6) word(isfulog.i,4)
-    if word(isfulog.i,1) = 'RELEASE' then
-      system.lparc = system.lparc word(isfulog.i,6) word(isfulog.i,3)
-  end
-  system.0 = lparc
+  Address SDSF 'ISFEXEC sys'
 
-  Say 'SYSPLEX  IPL Date/Time       Release'
-  say '-------  ------------------- -------------'
-  do i = 1 to lparc
-    say left(word(system.i,1),8) subword(system.i,2)
+  /* ------------- *
+  | Report Header |
+  * ------------- */
+  say left('System',8) left('Level',13) ,
+    left('IPL-Date',8) left('IPL-Time',8) ,
+    left('IPLVol',6) ,
+    left('LPAR',4) ,
+    left('CECmsu',6) left('SYSmsu',6) ,
+    left('JESNode',8),
+    left('CPU',6) 'Model' 'Serial'
+  /* ------------------- *
+  | Generate the report |
+  * ------------------- */
+  do i = 1 to sysname.0
+    parse value cpc.i with processor'.'mdl'.'mfg'.'ver'.'serial
+    say left(sysname.i,8) ,
+      left(syslevel.i,13),
+      word(ipldate.i,1) word(ipldate.i,2) ,
+      left(iplvol.i,6) ,
+      left(lpar.i,4) ,
+      left(msu.i,6) left(sysmsu.i,6) ,
+      left(jesnode.i,8),
+      left(processor,6) '  'mdl serial
   end
+  x = isfcalls('off')
