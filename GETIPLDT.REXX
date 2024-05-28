@@ -19,6 +19,8 @@
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
+  |            2024/05/28 LBD - Convert Julian date to         |
+  |                             yyyy/mm/dd                     |
   |            2024/05/25 LBD - redo using SDSF SYS info       |
   |            2024/02/10 LBD - enable use under shell         |
   |            2023/09/06 LBD - Add isfcalls(off)              |
@@ -59,7 +61,7 @@
   | Report Header |
   * ------------- */
   say left('System',8) left('Level',13) ,
-    left('IPL-Date',8) left('IPL-Time',8) ,
+    left('IPL-Date',10) left('IPL-Time',8) ,
     left('IPLVol',6) ,
     left('LPAR',4) ,
     left('CECmsu',6) left('SYSmsu',6) ,
@@ -70,9 +72,13 @@
   * ------------------- */
   do i = 1 to sysname.0
     parse value cpc.i with processor'.'mdl'.'mfg'.'ver'.'serial
+    parse value ipldate.i with date time
+    parse value date with 3 year'.'days
+    date = date('s',year||days,'j')
+    date = left(date,4)'/'substr(date,5,2)'/'right(date,2)
     say left(sysname.i,8) ,
       left(syslevel.i,13),
-      word(ipldate.i,1) word(ipldate.i,2) ,
+      date time ,
       left(iplvol.i,6) ,
       left(lpar.i,4) ,
       left(msu.i,6) left(sysmsu.i,6) ,
