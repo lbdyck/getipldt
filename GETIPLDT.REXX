@@ -21,6 +21,7 @@
   | History:  (most recent on top)                             |
   |            2024/05/28 LBD - Convert Julian date to         |
   |                             yyyy/mm/dd                     |
+  |                           - if lpar is null then ----      |
   |            2024/05/25 LBD - redo using SDSF SYS info       |
   |            2024/02/10 LBD - enable use under shell         |
   |            2023/09/06 LBD - Add isfcalls(off)              |
@@ -76,6 +77,7 @@
     parse value date with 3 year'.'days
     date = date('s',year||days,'j')
     date = left(date,4)'/'substr(date,5,2)'/'right(date,2)
+    if strip(lpar.i) = '' then lpar.i = '----'
     say left(sysname.i,8) ,
       left(syslevel.i,13),
       date time ,
