@@ -19,6 +19,7 @@
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
+  |            2024/08/01 LBD - Add CPU %                      |
   |            2024/05/28 LBD - Convert Julian date to         |
   |                             yyyy/mm/dd                     |
   |                           - if lpar is null then ----      |
@@ -65,6 +66,7 @@
     left('IPL-Date',10) left('IPL-Time',8) ,
     left('IPLVol',6) ,
     left('LPAR',4) ,
+    right('CPU%',6) ,
     left('CECmsu',6) left('SYSmsu',6) ,
     left('JESNode',8),
     left('CPU',6) 'Model' 'Serial'
@@ -83,6 +85,7 @@
       date time ,
       left(iplvol.i,6) ,
       left(lpar.i,4) ,
+      right(cpupr.i,6) ,
       left(msu.i,6) left(sysmsu.i,6) ,
       left(jesnode.i,8),
       left(processor,6) '  'mdl serial
