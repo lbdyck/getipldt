@@ -19,6 +19,7 @@
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
+  |            2024/08/02 LBD - Right justify the msu's        |
   |            2024/08/01 LBD - Add CPU %                      |
   |            2024/05/28 LBD - Convert Julian date to         |
   |                             yyyy/mm/dd                     |
@@ -86,7 +87,7 @@
       left(iplvol.i,6) ,
       left(lpar.i,4) ,
       right(cpupr.i,6) ,
-      left(msu.i,6) left(sysmsu.i,6) ,
+      right(msu.i,6) right(sysmsu.i,6) ,
       left(jesnode.i,8),
       left(processor,6) '  'mdl serial
   end
